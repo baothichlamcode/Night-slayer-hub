@@ -1,0 +1,410 @@
+Your Lua file **baothichlamcode.lua** is ready.
+You can use the complete code below directly or load it into your executor:
+```lua
+-- Night Slayer Hub - Key System & UI Loader
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+
+-- Check if the key was previously saved (to avoid re-entering)
+local keyFileName = "night_slayer_saved_key.txt"
+local function checkSavedKey()
+    local success, content = pcall(function()
+        return readfile(keyFileName)
+    end)
+    if success and content == "Baothichlamcode" then
+        return true
+    end
+    return false
+end
+
+if checkSavedKey() then
+    loadstring(game:HttpGet(‘https://pastefy.app/Dz2gnKLe/raw'))()
+    return
+end
+
+-- Create Main GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NightSlayerKeySystem"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+-- Function to make the frame draggable on both Mobile and PC
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- Floating Toggle Button (draggable to hide/show the menu on mobile & PC)
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleMenu"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.BorderColor3 = Color3.fromRGB(0, 170, 255)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "UI"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 18
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICornerToggle = Instance.new("UICorner")
+UICornerToggle.CornerRadius = UDim.new(0, 12)
+UICornerToggle.Parent = ToggleButton
+
+-- Main Frame (Key Input Menu)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderColor3 = Color3.fromRGB(0, 170, 255)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 350, 0, 220)
+makeDraggable(MainFrame)
+
+local UICornerMain = Instance.new("UICorner")
+UICornerMain.CornerRadius = UDim.new(0, 10)
+UICornerMain.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Night Slayer Hub - Key System"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 10, 0, 45)
+StatusLabel.Size = UDim2.new(1, -20, 0, 25)
+StatusLabel.Font = Enum.Font.SourceSans
+StatusLabel.Text = "Click 'Get Key' to copy link"
+StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+StatusLabel.TextSize = 14
+
+-- Get Key Button
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Parent = MainFrame
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+GetKeyBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
+GetKeyBtn.Size = UDim2.new(0, 145, 0, 35)
+GetKeyBtn.Font = Enum.Font.SourceSansBold
+GetKeyBtn.Text = "Get Key"
+GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyBtn.TextSize = 16
+
+local UICornerGet = Instance.new("UICorner")
+UICornerGet.CornerRadius = UDim.new(0, 6)
+UICornerGet.Parent = GetKeyBtn
+
+-- Key Input Box (TextBox)
+local KeyBox = Instance.new("TextBox")
+KeyBox.Parent = MainFrame
+KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyBox.BorderColor3 = Color3.fromRGB(80, 80, 80)
+KeyBox.Position = UDim2.new(0.05, 0, 0.38, 0)
+KeyBox.Size = UDim2.new(0.9, 0, 0, 35)
+KeyBox.Font = Enum.Font.SourceSans
+KeyBox.PlaceholderText = "Enter your key here..."
+KeyBox.Text = ""
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.TextSize = 14
+
+local UICornerBox = Instance.new("UICorner")
+UICornerBox.CornerRadius = UDim.new(0, 6)
+UICornerBox.Parent = KeyBox
+
+-- Submit Button
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Parent = MainFrame
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
+SubmitBtn.Position = UDim2.new(0.52, 0, 0.75, 0)
+SubmitBtn.Size = UDim2.new(0, 145, 0, 35)
+SubmitBtn.Font = Enum.Font.SourceSansBold
+SubmitBtn.Text = "Submit Key"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.TextSize = 16
+
+local UICornerSub = Instance.new("UICorner")
+UICornerSub.CornerRadius = UDim.new(0, 6)
+UICornerSub.Parent = SubmitBtn
+
+-- Handle Get Key Click Event
+GetKeyBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        setclipboard("https://ouo.io/s2U7FGV")
+    end)
+    
+    -- Countdown for 10 seconds showing "Paste to google"
+    task.spawn(function()
+        GetKeyBtn.Active = false
+        for i = 10, 1, -1 do
+            StatusLabel.Text = "Paste to google (" .. i .. "s)"
+            task.wait(1)
+        end
+        StatusLabel.Text = "Link copied! Paste to google & get key."
+        GetKeyBtn.Active = true
+    end)
+end)
+
+-- Handle Submit Key Click Event
+SubmitBtn.MouseButton1Click:Connect(function()
+    local enteredKey = KeyBox.Text
+    if enteredKey == "Baothichlamcode" then
+        StatusLabel.Text = "Success! Loading script..."
+        pcall(function()
+            writefile(keyFileName, "Baothichlamcode")
+        end)
+        task.wait(1)
+        ScreenGui:Destroy()
+        loadstring(game:HttpGet('Your Lua file **baothichlamcode.lua** is ready.
+You can use the complete code below directly or load it into your executor:
+```lua
+-- Night Slayer Hub - Key System & UI Loader
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+local LocalPlayer = Players.LocalPlayer
+
+-- Check if the key was previously saved (to avoid re-entering)
+local keyFileName = "night_slayer_saved_key.txt"
+local function checkSavedKey()
+    local success, content = pcall(function()
+        return readfile(keyFileName)
+    end)
+    if success and content == "Baothichlamcode" then
+        return true
+    end
+    return false
+end
+
+if checkSavedKey() then
+    loadstring(game:HttpGet(‘https://pastefy.app/Dz2gnKLe/raw'))()
+    return
+end
+
+-- Create Main GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NightSlayerKeySystem"
+ScreenGui.Parent = CoreGui
+ScreenGui.ResetOnSpawn = false
+
+-- Function to make the frame draggable on both Mobile and PC
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+end
+
+-- Floating Toggle Button (draggable to hide/show the menu on mobile & PC)
+local ToggleButton = Instance.new("TextButton")
+ToggleButton.Name = "ToggleMenu"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+ToggleButton.BorderColor3 = Color3.fromRGB(0, 170, 255)
+ToggleButton.Position = UDim2.new(0.05, 0, 0.1, 0)
+ToggleButton.Size = UDim2.new(0, 50, 0, 50)
+ToggleButton.Font = Enum.Font.SourceSansBold
+ToggleButton.Text = "UI"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton.TextSize = 18
+ToggleButton.Active = true
+ToggleButton.Draggable = true
+
+local UICornerToggle = Instance.new("UICorner")
+UICornerToggle.CornerRadius = UDim.new(0, 12)
+UICornerToggle.Parent = ToggleButton
+
+-- Main Frame (Key Input Menu)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderColor3 = Color3.fromRGB(0, 170, 255)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -110)
+MainFrame.Size = UDim2.new(0, 350, 0, 220)
+makeDraggable(MainFrame)
+
+local UICornerMain = Instance.new("UICorner")
+UICornerMain.CornerRadius = UDim.new(0, 10)
+UICornerMain.Parent = MainFrame
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Parent = MainFrame
+Title.BackgroundTransparency = 1
+Title.Position = UDim2.new(0, 0, 0, 10)
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Font = Enum.Font.SourceSansBold
+Title.Text = "Night Slayer Hub - Key System"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 20
+
+-- Status Label
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = MainFrame
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Position = UDim2.new(0, 10, 0, 45)
+StatusLabel.Size = UDim2.new(1, -20, 0, 25)
+StatusLabel.Font = Enum.Font.SourceSans
+StatusLabel.Text = "Click 'Get Key' to copy link"
+StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+StatusLabel.TextSize = 14
+
+-- Get Key Button
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Parent = MainFrame
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+GetKeyBtn.Position = UDim2.new(0.05, 0, 0.75, 0)
+GetKeyBtn.Size = UDim2.new(0, 145, 0, 35)
+GetKeyBtn.Font = Enum.Font.SourceSansBold
+GetKeyBtn.Text = "Get Key"
+GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyBtn.TextSize = 16
+
+local UICornerGet = Instance.new("UICorner")
+UICornerGet.CornerRadius = UDim.new(0, 6)
+UICornerGet.Parent = GetKeyBtn
+
+-- Key Input Box (TextBox)
+local KeyBox = Instance.new("TextBox")
+KeyBox.Parent = MainFrame
+KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyBox.BorderColor3 = Color3.fromRGB(80, 80, 80)
+KeyBox.Position = UDim2.new(0.05, 0, 0.38, 0)
+KeyBox.Size = UDim2.new(0.9, 0, 0, 35)
+KeyBox.Font = Enum.Font.SourceSans
+KeyBox.PlaceholderText = "Enter your key here..."
+KeyBox.Text = ""
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.TextSize = 14
+
+local UICornerBox = Instance.new("UICorner")
+UICornerBox.CornerRadius = UDim.new(0, 6)
+UICornerBox.Parent = KeyBox
+
+-- Submit Button
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Parent = MainFrame
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 80)
+SubmitBtn.Position = UDim2.new(0.52, 0, 0.75, 0)
+SubmitBtn.Size = UDim2.new(0, 145, 0, 35)
+SubmitBtn.Font = Enum.Font.SourceSansBold
+SubmitBtn.Text = "Submit Key"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.TextSize = 16
+
+local UICornerSub = Instance.new("UICorner")
+UICornerSub.CornerRadius = UDim.new(0, 6)
+UICornerSub.Parent = SubmitBtn
+
+-- Handle Get Key Click Event
+GetKeyBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        setclipboard("https://ouo.io/s2U7FGV")
+    end)
+    
+    -- Countdown for 10 seconds showing "Paste to google"
+    task.spawn(function()
+        GetKeyBtn.Active = false
+        for i = 10, 1, -1 do
+            StatusLabel.Text = "Paste to google (" .. i .. "s)"
+            task.wait(1)
+        end
+        StatusLabel.Text = "Link copied! Paste to google & get key."
+        GetKeyBtn.Active = true
+    end)
+end)
+
+-- Handle Submit Key Click Event
+SubmitBtn.MouseButton1Click:Connect(function()
+    local enteredKey = KeyBox.Text
+    if enteredKey == "Baothichlamcode" then
+        StatusLabel.Text = "Success! Loading script..."
+        pcall(function()
+            writefile(keyFileName, "Baothichlamcode")
+        end)
+        task.wait(1)
+        ScreenGui:Destroy()
+        loadstring(game:HttpGet('https://pastefy.app/Dz2gnKLe/raw'))()
+    else
+        StatusLabel.Text = "Incorrect key! Please try again."
+        KeyBox.Text = ""
+    end
+end)
+
+-- Handle Toggle Button to Hide/Show Main Menu
+local menuVisible = true
+ToggleButton.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    MainFrame.Visible = menuVisible
+end)
+
+```
+nKLe/raw'))()
+    else
+        StatusLabel.Text = "Incorrect key! Please try again."
+        KeyBox.Text = ""
+    end
+end)
+
+-- Handle Toggle Button to Hide/Show Main Menu
+local menuVisible = true
+ToggleButton.MouseButton1Click:Connect(function()
+    menuVisible = not menuVisible
+    MainFrame.Visible = menuVisible
+end)
+
+```
